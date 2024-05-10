@@ -43,6 +43,13 @@ dependencies {
     // Swagger UI(spring boot 3에서 사용)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
+    //p.788 JSON문자열 처리를 위한gson json파일을 쉽게 변환해준다
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    //jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5','io.jsonwebtoken:jjwt-jackson:0.12.5'
+
 
 }
 

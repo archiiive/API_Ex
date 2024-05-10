@@ -1,6 +1,8 @@
 package com.example.api01.config;
 
 import com.example.api01.security.APIUserDetailService;
+import com.example.api01.security.filter.APILoginFilter;
+import com.example.api01.security.handler.APILoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -15,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -53,7 +56,7 @@ public class CustomSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http )throws Exception{
-        log.info("-------------------------- C O N F I G U R E --------------------------");
+        log.info("-------------------------- C O N F I G U R E      |       S T A R T--------------------------");
         //AuthenticationManager설정
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -63,10 +66,45 @@ public class CustomSecurityConfig {
 
         //P.787 GetAuthenticationManager
         //매니저를 설정하기위해서 빌더에
+        log.info("-------------------------- authenticationManager config     |       S T A R T--------------------------\n"+"\n");
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+        log.info(authenticationManager+"\n");
+        log.info("-------------------------- authenticationManager config     |       E N D--------------------------\n"+"\n");
 
         //인증 매니저 등록
+        log.info("-------------------------- 인증매니저 등록     |       S T A R T--------------------------\n"+"\n");
+        log.info(http.authenticationManager(authenticationManager)+"\n");
         http.authenticationManager(authenticationManager);
+        log.info("-------------------------- 인증매니저 등록    |        E N D--------------------------\n"+"\n"+"\n");
+
+
+        //APIloginFilter 설정...
+        log.info("-------------------------- APIloginFilter 설정     |       S T A R T--------------------------\n"+"\n");
+        log.info(apiUserDetailService+"\n");
+        APILoginFilter apiLoginFilter = new APILoginFilter("/generateToken");
+        apiLoginFilter.setAuthenticationManager(authenticationManager);
+        log.info("-------------------------- APIloginFilter 설정     |       E N D--------------------------\n"+"\n"+"\n");
+
+
+        //APILoginFilter 의 위치 조정
+        log.info("-------------------------- APIloginFilter 설정     |       S T A R T--------------------------\n"+"\n");
+
+        //UsernamePasswordAuthentication 이전에 동작해야하는 필터이기 때문에
+        http.addFilterBefore(apiLoginFilter, UsernamePasswordAuthenticationFilter.class);
+        log.info(http.addFilterBefore(apiLoginFilter, UsernamePasswordAuthenticationFilter.class)+"\n");
+        log.info("-------------------------- APIloginFilter 설정     |       END--------------------------\n"+"\n"+"\n");
+
+        //APILoginSuccessHandler
+        log.info("-------------------------- APILoginSuccessHandler     |       S T A R T--------------------------\n"+"\n");
+        APILoginSuccessHandler successHandler =  new APILoginSuccessHandler();
+        log.info(successHandler+"\n");
+        log.info("-------------------------- APILoginSuccessHandler     |       E N D--------------------------\n"+"\n"+"\n");
+
+        //SuccessHandler설정
+        log.info("-------------------------- apiLoginFilter     |       S T A R T--------------------------\n"+"\n");
+        apiLoginFilter.setAuthenticationSuccessHandler(successHandler);
+        log.info(apiLoginFilter+"\n");
+        log.info("-------------------------- apiLoginFilter    |      E N D--------------------------\n"+"\n"+"\n");
 
 
 
@@ -77,6 +115,8 @@ public class CustomSecurityConfig {
                  httpSecuritySessionManagementConfigurer.sessionCreationPolicy(
                          SessionCreationPolicy.STATELESS
                  ));
+        log.info("-------------------------- C O N F I G U R E          |                 E N D--------------------------");
+
         return http.build();
     }
 
