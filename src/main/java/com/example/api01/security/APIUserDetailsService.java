@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class APIUserDetailService implements UserDetailsService {
+public class APIUserDetailsService implements UserDetailsService {
 
     //주입
     private final APIUserRepository apiUserRepository;

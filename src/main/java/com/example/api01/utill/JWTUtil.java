@@ -14,9 +14,7 @@ import java.util.Map;
 
 @Component
 @Log4j2
-
 public class JWTUtil {
-
 
     @Value("${com.zerock.jwt.secret}")   // application.properties 설정된 값을 불러오는 어노테이션
     private String key;
@@ -35,14 +33,13 @@ public class JWTUtil {
         payloads.putAll(valueMap);
 
         // 토큰 생성 시간 설정...
-        int time = (1) * days;
+        int time = (60 * 24) * days;   // 시간설정 변경... 1day로 ...
 
         String jwtStr = Jwts.builder()
                 .setHeader(headers)
                 .setClaims(payloads)
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-                                                                //보통 한시간 또는 하루정도를 사용 한다.
-                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(time).toInstant()))
+                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(days).toInstant()))
                 .signWith(SignatureAlgorithm.HS256, key.getBytes())
                 .compact();
 
@@ -55,8 +52,8 @@ public class JWTUtil {
         Map<String, Object> claim = null;
 
         claim = Jwts.parser()
-                .setSigningKey(key.getBytes()).build() //set key
-                .parseClaimsJws(token)
+                .setSigningKey(key.getBytes()).build()
+                .parseSignedClaims(token)
                 .getBody();
 
         return claim;

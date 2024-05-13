@@ -34,5 +34,17 @@ public class JWTUtillTests {
         log.info(claim);
     }
 
+    @Test //P.803
+    public  void testAll(){
+        String jwtStr = jwtUtil.generateToken(Map.of("mid","AAAA","email","aaa@bbb.ccc"),1);
+        log.info("-------------------------- jwStr    |      START--------------------------\n");
+        log.info(jwtStr);
+        log.info("--------------------------  jwStr    |     END--------------------------\n"+"\n"+"\n");
+
+        Map<String,Object> claim = jwtUtil.validateToken(jwtStr);
+        log.info("MOD : "+claim.get("mid"));
+        log.info("EMAIL : "+claim.get("email"));
+    }
+
 
 }
